@@ -153,7 +153,7 @@
                 statusDiv.innerHTML = '⏳ Регистрация Service Worker...';
                 
                 // Ждем регистрации и активации Service Worker
-                const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+                const registration = await navigator.serviceWorker.register('/repo/firebase-messaging-sw.js');
                 
                 // Ждем активации Service Worker
                 await navigator.serviceWorker.ready;
