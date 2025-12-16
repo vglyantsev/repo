@@ -161,7 +161,7 @@
                             // Получаем токен
                         const token = await messaging.getToken({ 
                             vapidKey: VAPID_KEY,
-                            serviceWorkerRegistration: await navigator.serviceWorker.register('/path/to/firebase-messaging-sw.js')
+                            serviceWorkerRegistration: await navigator.serviceWorker.register('/repo/firebase-messaging-sw.js')
                         });
 
                             
