@@ -159,9 +159,11 @@
                             resultDiv.innerHTML = '<p>⏳ Получаем токен...</p>';
                             
                             // Получаем токен
-                            const token = await messaging.getToken({ 
-                                vapidKey: VAPID_KEY 
-                            });
+                        const token = await messaging.getToken({ 
+                            vapidKey: VAPID_KEY,
+                            serviceWorkerRegistration: await navigator.serviceWorker.register('/path/to/firebase-messaging-sw.js')
+                        });
+
                             
                             // Показываем результат
                             resultDiv.innerHTML = `
