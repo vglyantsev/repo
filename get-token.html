@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Получить WebPush токен - test-project-1-to-1</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-top: 0;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 32px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            margin-top: 10px;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .error {
+            color: #d32f2f;
+            background: #ffebee;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .success {
+            color: #388e3c;
+            background: #e8f5e9;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .info {
+            background-color: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .project-info {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+        pre {
+            background: #263238;
+            color: #aed581;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔔 Получить WebPush токен</h1>
+        
+        <div class="project-info">
+            <strong>Проект Firebase:</strong> test-project-1-to-1<br>
+            <strong>Project ID:</strong> test-project-1-to-1<br>
+            <strong>Sender ID:</strong> 732798826390
+        </div>
+        
+        <div class="info">
+            <strong>Инструкция:</strong>
+            <ol>
+                <li>Откройте этот файл в браузере (двойной клик или перетащите в браузер)</li>
+                <li>Нажмите кнопку "Получить токен"</li>
+                <li>Разрешите уведомления в браузере</li>
+                <li>Скопируйте полученный токен</li>
+                <li>Используйте токен в curl запросе</li>
+            </ol>
+        </div>
+        
+        <button id="getToken" disabled>Загрузка Firebase...</button>
+        <div id="result"></div>
+    </div>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
+    
+    <script>
+        window.addEventListener('load', function() {
+            try {
+                // Конфигурация Firebase для test-project-1-to-1
+                const firebaseConfig = {
+                    apiKey: "AIzaSyCxHbpZ44xpg80L67lHOwbvlyNqsdzEfqM",
+                    authDomain: "test-project-1-to-1.firebaseapp.com",
+                    projectId: "test-project-1-to-1",
+                    storageBucket: "test-project-1-to-1.appspot.com",
+                    messagingSenderId: "732798826390",
+                    appId: "1:732798826390:web:db8ba268d97fdd60138fb7"
+                };
+                
+                // VAPID ключ для test-project-1-to-1
+                const VAPID_KEY = 'BJMd8PT1yaGZiY1VkPXoI7Denul16Nbuo40m_u3WewibrDBDvlFpQuNlbj_-Y2DkFSyrk2wqv6zB5wv_fWDjG2w';
+                
+                // Инициализация Firebase
+                firebase.initializeApp(firebaseConfig);
+                const messaging = firebase.messaging();
+                
+                // Активируем кнопку
+                const button = document.getElementById('getToken');
+                button.disabled = false;
+                button.textContent = '🔔 Получить токен';
+                
+                // Обработчик клика
+                button.addEventListener('click', async () => {
+                    const resultDiv = document.getElementById('result');
+                    resultDiv.innerHTML = '<p>⏳ Запрашиваем разрешение...</p>';
+                    
+                    try {
+                        // Проверяем поддержку уведомлений
+                        if (!('Notification' in window)) {
+                            throw new Error('Этот браузер не поддерживает уведомления');
+                        }
+                        
+                        // Запрашиваем разрешение
+                        const permission = await Notification.requestPermission();
+                        
+                        if (permission === 'granted') {
+                            resultDiv.innerHTML = '<p>⏳ Получаем токен...</p>';
+                            
+                            // Получаем токен
+                            const token = await messaging.getToken({ 
+                                vapidKey: VAPID_KEY 
+                            });
+                            
+                            // Показываем результат
+                            resultDiv.innerHTML = `
+                                <div class="success">
+                                    <h3>✅ Токен успешно получен!</h3>
+                                    <p><strong>Проект:</strong> test-project-1-to-1</p>
+                                </div>
+                                <h4>Ваш WebPush токен:</h4>
+                                <textarea id="tokenArea" readonly>${token}</textarea>
+                                <br>
+                                <button onclick="copyToken()">📋 Копировать токен</button>
+                                <button onclick="showCurlExample()">📝 Показать curl команду</button>
+                            `;
+                            
+                            console.log('FCM Token:', token);
+                            window.currentToken = token;
+                            
+                        } else if (permission === 'denied') {
+                            resultDiv.innerHTML = `
+                                <div class="error">
+                                    <h3>❌ Разрешение отклонено</h3>
+                                    <p>Вы отклонили разрешение на уведомления.</p>
+                                    <p><strong>Чтобы разрешить:</strong></p>
+                                    <ol>
+                                        <li>Нажмите на иконку замка/информации в адресной строке</li>
+                                        <li>Найдите "Уведомления" и измените на "Разрешить"</li>
+                                        <li>Обновите страницу (F5) и попробуйте снова</li>
+                                    </ol>
+                                </div>
+                            `;
+                        } else {
+                            resultDiv.innerHTML = `
+                                <div class="error">
+                                    <h3>⚠️ Разрешение не получено</h3>
+                                    <p>Статус: ${permission}</p>
+                                </div>
+                            `;
+                        }
+                        
+                    } catch (error) {
+                        console.error('Ошибка:', error);
+                        resultDiv.innerHTML = `
+                            <div class="error">
+                                <h3>❌ Ошибка</h3>
+                                <p><strong>Сообщение:</strong> ${error.message}</p>
+                                <p><strong>Проверьте консоль браузера (F12) для деталей</strong></p>
+                            </div>
+                        `;
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Ошибка инициализации:', error);
+                document.getElementById('result').innerHTML = `
+                    <div class="error">
+                        <h3>❌ Ошибка инициализации Firebase</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        });
+        
+        // Функция копирования токена
+        function copyToken() {
+            const tokenArea = document.getElementById('tokenArea');
+            tokenArea.select();
+            document.execCommand('copy');
+            alert('✅ Токен скопирован в буфер обмена!');
+        }
+        
+        // Функция показа примера curl
+        function showCurlExample() {
+            const token = window.currentToken;
+            const curlExample = `curl -X POST http://localhost:8088/api/push \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "notifications": [{
+      "tokens": ["${token}"],
+      "platform": 2,
+      "title": "🔔 Тестовое уведомление",
+      "message": "Это тест WebPush через gorush для test-project-1-to-1",
+      "webpush": {
+        "notification": {
+          "icon": "https://via.placeholder.com/192x192.png?text=Test",
+          "image": "https://via.placeholder.com/600x300.png?text=WebPush"
+        },
+        "fcm_options": {
+          "link": "https://example.com/test"
+        }
+      }
+    }]
+  }'`;
+            
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML += `
+                <hr>
+                <h3>📝 Готовая curl команда:</h3>
+                <pre>${curlExample}</pre>
+                <button onclick="copyCurl()">📋 Копировать curl команду</button>
+                <div class="info">
+                    <strong>Убедитесь, что gorush запущен:</strong>
+                    <pre style="background: #263238; color: #aed581; padding: 10px; margin-top: 10px;">go run main.go -c config/develop/config.yml -keypath credentials/1-to-1.json</pre>
+                </div>
+            `;
+            
+            window.currentCurl = curlExample;
+        }
+        
+        // Функция копирования curl
+        function copyCurl() {
+            navigator.clipboard.writeText(window.currentCurl);
+            alert('✅ Curl команда скопирована!');
+        }
+    </script>
+</body>
+</html>
