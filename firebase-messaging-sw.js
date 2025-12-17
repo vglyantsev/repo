@@ -2,6 +2,25 @@
 importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js');
 
+// Обработчик установки Service Worker
+self.addEventListener('install', (event) => {
+    console.log('Service Worker installing...');
+    self.skipWaiting(); // Немедленно активируем новый Service Worker
+});
+
+// Обработчик активации Service Worker
+self.addEventListener('activate', (event) => {
+    console.log('Service Worker activating...');
+    event.waitUntil(clients.claim()); // Берем контроль над всеми клиентами
+});
+
+// Обработчик сообщений от страницы
+self.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'SKIP_WAITING') {
+        self.skipWaiting();
+    }
+});
+
 // Конфигурация Firebase для test-project-1-to-1
 firebase.initializeApp({
     apiKey: "AIzaSyCxHbpZ44xpg80L67lHOwbvlyNqsdzEfqM",
