@@ -127,11 +127,24 @@
     <script>
         let messaging;
         
+        // Определяем Safari
+        const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+        
         window.addEventListener('load', async function() {
             const statusDiv = document.getElementById('status');
             const button = document.getElementById('getToken');
             
             try {
+                // Проверка для Safari
+                if (isSafari) {
+                    console.log('Обнаружен Safari');
+                    
+                    // Проверяем поддержку Push API
+                    if (!('PushManager' in window)) {
+                        throw new Error('Safari на этом устройстве не поддерживает Web Push. Требуется macOS 13+ или iOS 16.4+');
+                    }
+                }
+                
                 statusDiv.innerHTML = '⏳ Инициализация Firebase...';
                 
                 // Конфигурация Firebase
@@ -148,7 +161,17 @@
                 
                 // Инициализация Firebase
                 firebase.initializeApp(firebaseConfig);
-                messaging = firebase.messaging();
+                
+                // Для Safari используем особую инициализацию
+                try {
+                    messaging = firebase.messaging();
+                } catch (e) {
+                    console.error('Ошибка инициализации Firebase Messaging:', e);
+                    if (isSafari) {
+                        throw new Error('Firebase Messaging не поддерживается в этой версии Safari. Обновите Safari до последней версии или используйте Chrome/Firefox.');
+                    }
+                    throw e;
+                }
                 
                 statusDiv.innerHTML = '⏳ Регистрация Service Worker...';
                 
@@ -156,9 +179,9 @@
                 let registration = await navigator.serviceWorker.getRegistration();
                 
                 if (!registration) {
-                    // Регистрируем новый Service Worker
+                    // Регистрируем новый Service Worker с правильным путем для GitHub Pages
                     registration = await navigator.serviceWorker.register('/repo/firebase-messaging-sw.js', {
-                        scope: './'
+                        scope: '/repo/'
                     });
                     console.log('Service Worker зарегистрирован:', registration);
                 }
