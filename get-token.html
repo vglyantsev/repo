@@ -157,7 +157,7 @@
                 
                 if (!registration) {
                     // Регистрируем новый Service Worker
-                    registration = await navigator.serviceWorker.register('firebase-messaging-sw.js', {
+                    registration = await navigator.serviceWorker.register('./firebase-messaging-sw.js', {
                         scope: './'
                     });
                     console.log('Service Worker зарегистрирован:', registration);
